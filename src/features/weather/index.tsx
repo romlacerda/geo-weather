@@ -59,8 +59,6 @@ export const Weather = () => {
     return acc;
   }, [] as ForecastPeriod[]);
 
-  console.log(groupedForecast);
-
   return (
     <div className="flex flex-col items-center justify-center gap-y-2">
       <h1 className="text-2xl font-bold text-slate-900">Weather Forecast</h1>
