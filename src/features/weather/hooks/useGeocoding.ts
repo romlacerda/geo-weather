@@ -1,32 +1,41 @@
 import { useState } from "react";
 
-export const useGeocoding = () => {
-    const [geocoding, setGeocoding] = useState([]);
-    const [loading, setLoading] = useState(false);
+type Props = {
+    address: string;
+}
+
+interface Coordinates {
+    x: number;
+    y: number;
+}
+
+export const useGeocoding = ({ address }: Props) => {
+    const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchGeocoding = async (address: string) => {
-        if (!address.trim()) return;
-        
-        setLoading(true);
+    const fetchGeocoding = async () => {
+        setIsLoading(true);
+
         setError(null);
         try {
-            // Use the proxy endpoint instead of direct API
             const url = `/api/geocode?address=${encodeURIComponent(address)}&benchmark=2020&format=json`;
             
             const response = await fetch(url);
             
             const data = await response.json();
             
-            setGeocoding(data.result.addressMatches);
+            const coords = data.result.addressMatches[0].coordinates;
+            
+            setCoordinates(coords);
         } catch (err) {
             console.error('Geocoding error:', err);
             setError(err instanceof Error ? err.message : 'Failed to geocode address');
         } finally {
-            setLoading(false);
+            setIsLoading(false);
         }
     };
 
-    return { geocoding, loading, error, fetchGeocoding };
+    return { coordinates, isLoading, error, fetchGeocoding };
 }
     
